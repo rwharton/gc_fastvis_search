@@ -375,7 +375,7 @@ def beam_summary(cand, cands, bcands, beams, coords, fwhm, add_label=False,
     ax_t0.set_xlabel("Time (s)")
     ax_t0.set_ylabel("DM (pc/cc)")
 
-    tstr = "Cand %04d, DM=%d pc/cc, tt=%.2f s, SNR=%.1f, Beam=%04d" %(\
+    tstr = "Cand %04d, DM=%d pc/cc, tt=%.2f s, SNR=%.1f, Beam=%05d" %(\
                     cand.cnum, cand.dm, cand.time, cand.sigma, cand.beam)
     ax_t0.set_title(tstr)
 
@@ -498,7 +498,7 @@ def summary_beam_from_candlist(cands_dir, coords, beams, candlist, fwhm,
     for ii, cc in enumerate(candlist):
         outname = "Cand%04d_beams.png" %(ii)
 
-        bfile = "%s/beam%04d_dmsift.npy" %(cands_dir, cc.beam)
+        bfile = "%s/beam%05d_dmsift.npy" %(cands_dir, cc.beam)
         bcands = np.load(bfile)
         
         beam_summary(cc, candlist, bcands, beams, coords, fwhm, 

@@ -126,7 +126,7 @@ def dat_from_cand(cand, topdir, tsearch, tpad):
     beam  = cand.beam
     dfact = cand.dfact
     
-    fitsfiles = glob.glob("%s/*beam%04d*fits" %(topdir, beam))
+    fitsfiles = glob.glob("%s/*beam%05d*fits" %(topdir, beam))
     fitsfiles.sort()
     off_starts = dspec.get_starts_for_fits(fitsfiles)
     
@@ -174,8 +174,8 @@ def summary_pulse(cand, topdir, tsearch, tpad=0, tsamp_avg=1, nchan_avg=1,
         pass
    
     ## GET FITS ##
-    fitsfiles = glob.glob("%s/*beam%04d*fits" %(topdir, beam))
-    #fitsfiles = glob.glob("%s/part*/psrfits/*beam%04d*fits" %(topdir, beam))
+    fitsfiles = glob.glob("%s/*beam%05d*fits" %(topdir, beam))
+    #fitsfiles = glob.glob("%s/part*/psrfits/*beam%05d*fits" %(topdir, beam))
     fitsfiles.sort()
     off_starts = dspec.get_starts_for_fits(fitsfiles)
     otime, infile, xxf = dspec.get_fits_name_time(time, fitsfiles, off_starts)
@@ -473,8 +473,8 @@ def summary_pulse2(cand, topdir, tsearch, tpad=0, tsamp_avg=1, nchan_avg=1,
 
    
     ## GET FITS ##
-    #fitsfiles = glob.glob("%s/*beam%04d*fits" %(topdir, beam))
-    fitsfiles = glob.glob("%s/part*/psrfits/*beam%04d*fits" %(topdir, beam))
+    #fitsfiles = glob.glob("%s/*beam%05d*fits" %(topdir, beam))
+    fitsfiles = glob.glob("%s/part*/psrfits/*beam%05d*fits" %(topdir, beam))
     fitsfiles.sort()
     off_starts = dspec.get_starts_for_fits(fitsfiles)
     otime, infile, xxf = dspec.get_fits_name_time(time, fitsfiles, off_starts)

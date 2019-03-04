@@ -6,7 +6,7 @@ from glob import glob
 import shutil 
 
 def beam_exists(bnum, out_dir):
-    bdir = "%s/beam%04d" %(out_dir, bnum)
+    bdir = "%s/beam%05d" %(out_dir, bnum)
     return os.path.exists(bdir)
 
 
@@ -51,8 +51,8 @@ def copy_beam_results(bnum, tmp_dir, out_dir):
     Remove fits files and copy results 
     """
     # WORK AND RESULTS DIRECTORIES
-    work_dir  = "%s/beam%04d" %(tmp_dir, bnum)
-    res_dir = "%s/beam%04d" %(out_dir, bnum)
+    work_dir  = "%s/beam%05d" %(tmp_dir, bnum)
+    res_dir = "%s/beam%05d" %(out_dir, bnum)
     
     # Check for and copy directories
     sub_dirs = ["cands_presto", "dedisperse", "output_files",
@@ -100,16 +100,16 @@ if __name__ == "__main__":
         # Check if beam has already been processed 
         # (this sometimes happens if job fails / restarts)
         if beam_exists(bnum, search_dir):
-            print("Beam %04d results exist!" %(bnum))
+            print("Beam %05d results exist!" %(bnum))
             pass
         else: 
-            print("Beam %04d not found!" %(bnum))
+            print("Beam %05d not found!" %(bnum))
             continue
        
         # Basename + paths in tmp space
-        basename = "beam%04d" %(bnum)
+        basename = "beam%05d" %(bnum)
 
-        bdir = "%s/beam%04d" %(search_dir, bnum)
+        bdir = "%s/beam%05d" %(search_dir, bnum)
        
         # Try Set-up + Searching
         try:

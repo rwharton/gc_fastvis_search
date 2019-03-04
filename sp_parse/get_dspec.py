@@ -380,7 +380,7 @@ def stats_from_candfile_parts(candfile, topdir, tsearch, tpad,
 
     for ii in xrange(N):
         log_output("%d / %d" %(ii, N), logfile)
-        fitsfiles = glob.glob("%s/part*/psrfits/*beam%04d*fits" %(topdir, beams[ii]))
+        fitsfiles = glob.glob("%s/part*/psrfits/*beam%05d*fits" %(topdir, beams[ii]))
         #print(fitsfiles)
         fitsfiles.sort()
         off_starts = get_starts_for_fits(fitsfiles)

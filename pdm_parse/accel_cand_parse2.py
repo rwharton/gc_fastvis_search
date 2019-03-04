@@ -302,7 +302,7 @@ def copy_cand_plots(candlist, topdir, outdir, suffix='png'):
     for ii, cc in enumerate(candlist):
         fname = filename_from_cand(cc, suffix=suffix)
         out_fname = "cand%04d_%s" %(ii, fname)
-        infile  = "%s/beam%04d/cands_presto/%s" %(topdir, cc.beam, fname)
+        infile  = "%s/beam%05d/cands_presto/%s" %(topdir, cc.beam, fname)
         outfile = "%s/%s" %(outdir, out_fname)
         copyfile(infile, outfile)
     return
@@ -470,7 +470,7 @@ def run_prepfold_topcands(clist, bdir, zmax, outfile, errfile,
 #sys.exit()
 group = '57519'
 cand_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s/search/cand_files" %(group)
-candfile_template = "beam%04d.ACCEL_300.sifted.cands"
+candfile_template = "beam%05d.ACCEL_300.sifted.cands"
 
 beamlist = np.arange(0, 1000)
 

@@ -184,8 +184,8 @@ def collect_sp_files_beams(bnums, topdir, outdir):
     Will write beamXXX.cands in outdir
     """
     for bnum in bnums:
-        spdir = "%s/beam%04d/single_pulse" %(topdir,  bnum)
-        outfile = "beam%04d.cands" %(bnum)
+        spdir = "%s/beam%05d/single_pulse" %(topdir,  bnum)
+        outfile = "beam%05d.cands" %(bnum)
         collect_sp_files(spdir, outdir, outfile)
 
     return
@@ -214,7 +214,7 @@ def cands_from_many_files(beam_nums, cands_dir):
     plist = []
     for bnum in beam_nums:
         print(bnum)
-        sp_file = "%s/beam%04d.cands" %(cands_dir, bnum)
+        sp_file = "%s/beam%05d.cands" %(cands_dir, bnum)
         # check that file exists
         if not os.path.isfile(sp_file):
             sp_file = "%s/beam%03d.cands" %(cands_dir, bnum)
@@ -252,13 +252,13 @@ def combine_sp_files_multi(beam_list, beams_dir):
 
     for ii, bnum in enumerate(beam_list):
         # Check to see if dat dir exists 
-        dat_dir = "%s/beam%04d" %(beams_dir, bnum)
+        dat_dir = "%s/beam%05d" %(beams_dir, bnum)
         if not os.path.exists(dat_dir):
             print("dat dir not found: %s" %dat_dir)
             continue
         else: pass
 
-        sp_base = "beam%04d" %bnum
+        sp_base = "beam%05d" %bnum
         sp_files = glob("%s/%s*singlepulse" %(dat_dir, sp_base))
         sp_files.sort()
 
@@ -275,10 +275,10 @@ def pulse_groups_to_cands(bnums, pdir):
 
     assume pulse group npy files have form:
 
-      pdir/beam%04d_dmsift.npy
+      pdir/beam%05d_dmsift.npy
 
     """
-    pfiles = [ "%s/beam%04d_dmsift.npy" %(pdir, bnum) for bnum in bnums ]
+    pfiles = [ "%s/beam%05d_dmsift.npy" %(pdir, bnum) for bnum in bnums ]
     candlist = []
     for pfile in pfiles:
         if not os.path.isfile(pfile):
@@ -682,7 +682,7 @@ def filter_known_psr(cands, dm0, ddm, P, tpk0, window=(0.25, 0.5)):
 
 
 def check_phases(bnums, P):
-    fstr = "beam%04d_sift_cands.npy"
+    fstr = "beam%05d_sift_cands.npy"
     pks = []
     for bb in bnums:
         infile = fstr % bb
@@ -792,20 +792,20 @@ def make_mult_plots(bdir, bnums, dm0, ddm, P, tpk, max_w=100,
 
     (max_w only for plot, all cands written to file)
     """
-    bstr = "beam%04d_sift_cands.npy"
+    bstr = "beam%05d_sift_cands.npy"
     for bb in bnums:
         infile = bdir + "/" + bstr %bb
         all_cands = np.load(infile)
         in_cands, cands = filter_known_psr(all_cands, dm0, ddm, P, tpk)
-        wmag_plot = "beam%04d_mag.png" %bb
-        nomag_plot = "beam%04d_cand.png" %bb
+        wmag_plot = "beam%05d_mag.png" %bb
+        nomag_plot = "beam%05d_cand.png" %bb
         if make_plots:
-            make_plot(in_cands, max_w=max_w, fig_title="beam%04d" %bb, out_name=wmag_plot)
-            make_plot(cands, max_w=max_w, fig_title="beam%04d" %bb, out_name=nomag_plot)
+            make_plot(in_cands, max_w=max_w, fig_title="beam%05d" %bb, out_name=wmag_plot)
+            make_plot(cands, max_w=max_w, fig_title="beam%05d" %bb, out_name=nomag_plot)
         else: pass
 
         if write_file:
-            out_txt = "beam%04d_filter.cands" %bb
+            out_txt = "beam%05d_filter.cands" %bb
             write_cands(out_txt, cands)
         else: pass
     return
@@ -834,8 +834,8 @@ def write_cands(outfile, cands):
 
 def write_cands_mult(bnum):
     for bb in bnum:
-        infile  = "beam%04d_filter_cands.npy" %bb
-        outfile = "beam%04d_filter.cands" %bb
+        infile  = "beam%05d_filter_cands.npy" %bb
+        outfile = "beam%05d_filter.cands" %bb
         cands = np.load(infile)
         write_cands(outfile, cands)
     return
@@ -917,8 +917,8 @@ if __name__ == "__main__":
 
     if per_beam_filter:
         for bnum in bnums:
-            print("\n== BEAM%04d ==" %(bnum))
-            sp_file = "%s/beam%04d.cands" %(cands_dir, bnum)
+            print("\n== BEAM%05d ==" %(bnum))
+            sp_file = "%s/beam%05d.cands" %(cands_dir, bnum)
             if not os.path.isfile(sp_file):
                 print("FILE NOT FOUND: %s" %(sp_file))
                 print("...skipping")
@@ -934,7 +934,7 @@ if __name__ == "__main__":
             #cands = [cands[ii] for ii in xxt ]
 
             cands_sift_dm = filter_dm_cands(cands, W, freqs, twin)
-            npy_path = "%s/beam%04d_dmsift.npy" %(cands_dir, bnum)
+            npy_path = "%s/beam%05d_dmsift.npy" %(cands_dir, bnum)
             np.save(npy_path, cands_sift_dm)
 
             del cands

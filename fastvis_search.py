@@ -725,22 +725,22 @@ def search_beam(fitsname, fits_dir, work_dir):
 
 
 def beam_exists(bnum, out_dir):
-    bdir = "%s/beam%04d" %(out_dir, bnum)
+    bdir = "%s/beam%05d" %(out_dir, bnum)
     return os.path.exists(bdir)
 
 
 def setup_beam_orig(bnum, tmp_dir, top_dir, basename, part_list):
     # Make beam dir if doesnt exist
-    bdir = "%s/beam%04d" %(tmp_dir, bnum)
+    bdir = "%s/beam%05d" %(tmp_dir, bnum)
     if not os.path.exists(bdir):
         os.makedirs(bdir)
     else: pass
 
     # Copy FITS files 
     for pp in part_list:
-        src_file = "%s/part%d/psrfits/%s_part%d_beam%04d.fits"\
+        src_file = "%s/part%d/psrfits/%s_part%d_beam%05d.fits"\
                    %(top_dir, pp, basename, pp, bnum)
-        dest_file = "%s/beam%04d_part%d.fits" %(bdir, bnum, pp)
+        dest_file = "%s/beam%05d_part%d.fits" %(bdir, bnum, pp)
         shutil.copyfile(src_file, dest_file)
 
     return
@@ -753,13 +753,13 @@ def setup_beam(bnum, tmp_dir, out_dir, top_dir, basename, part_list):
     sub_dirs = ["rfi_products", "dedisperse", "cands_presto"]
 
     # Make PROC beam dir if doesnt exist
-    bdir_work = "%s/beam%04d" %(tmp_dir, bnum)
+    bdir_work = "%s/beam%05d" %(tmp_dir, bnum)
     if not os.path.exists(bdir_work):
         os.makedirs(bdir_work)
     else: pass
 
     # Make RESULTS beam dir if doesnt exist
-    bdir_res = "%s/beam%04d" %(out_dir, bnum)
+    bdir_res = "%s/beam%05d" %(out_dir, bnum)
     if not os.path.exists(bdir_res):
         os.makedirs(bdir_res)
     else: pass
@@ -768,9 +768,9 @@ def setup_beam(bnum, tmp_dir, out_dir, top_dir, basename, part_list):
     if copy_fits:
         print("COPYING OVER FITS FILES")
         for pp in part_list:
-            src_file = "%s/part%d/psrfits/%s_part%d_beam%04d.fits"\
+            src_file = "%s/part%d/psrfits/%s_part%d_beam%05d.fits"\
                        %(top_dir, pp, basename, pp, bnum)
-            dest_file = "%s/beam%04d_part%d.fits" %(bdir_work, bnum, pp)
+            dest_file = "%s/beam%05d_part%d.fits" %(bdir_work, bnum, pp)
             shutil.copyfile(src_file, dest_file)
     else:
         pass
@@ -837,8 +837,8 @@ def copy_beam_results_orig(bnum, tmp_dir, out_dir):
     """
     Remove fits files and copy results 
     """
-    src_dir  = "%s/beam%04d" %(tmp_dir, bnum)
-    dest_dir = "%s/beam%04d" %(out_dir, bnum)
+    src_dir  = "%s/beam%05d" %(tmp_dir, bnum)
+    dest_dir = "%s/beam%05d" %(out_dir, bnum)
     fitslist = glob("%s/beam*fits" %(src_dir))
     if len(fitslist):
         for fitsfile in fitslist:
@@ -853,8 +853,8 @@ def copy_beam_results(bnum, tmp_dir, out_dir):
     Remove fits files and copy results 
     """
     # WORK AND RESULTS DIRECTORIES
-    work_dir  = "%s/beam%04d" %(tmp_dir, bnum)
-    res_dir = "%s/beam%04d" %(out_dir, bnum)
+    work_dir  = "%s/beam%05d" %(tmp_dir, bnum)
+    res_dir = "%s/beam%05d" %(out_dir, bnum)
     
     # Check for and copy directories
     sub_dirs = ["cands_presto", "dedisperse", "output_files",
@@ -887,7 +887,7 @@ def copy_beam_results(bnum, tmp_dir, out_dir):
 
 
 def remove_beam(bnum, tmp_dir):
-    bdir = "%s/beam%04d" %(tmp_dir, bnum)
+    bdir = "%s/beam%05d" %(tmp_dir, bnum)
     if os.path.exists(bdir):
         shutil.rmtree(bdir)
     else: 
@@ -922,7 +922,7 @@ if __name__ == "__main__":
         # Check if beam has already been processed 
         # (this sometimes happens if job fails / restarts)
         if beam_exists(bnum, search_dir):
-            print("Beam %04d results exist!" %(bnum))
+            print("Beam %05d results exist!" %(bnum))
             if params.resume:
                 print("... resuming processing")
                 pass
@@ -932,7 +932,7 @@ if __name__ == "__main__":
         else: pass
        
         # Basename + paths in tmp space
-        basename = "beam%04d" %(bnum)
+        basename = "beam%05d" %(bnum)
         fits_dir = "%s/%s" %(tmp_dir, basename)
         work_dir = "%s/%s" %(tmp_dir, basename)
        
