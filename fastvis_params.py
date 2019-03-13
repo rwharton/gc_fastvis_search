@@ -1,5 +1,5 @@
 # Set up FITS directory and WORK directory
-group = "sp_test" #"pulsars" #"57519"
+group = "57519"
 search_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s/search" %(group)
 top_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s" %(group)
 bname = "mjd57519"  # Basename of FITS files
@@ -11,9 +11,9 @@ copy_fits = 1
 # Processing steps to do
 do_rfifind    = 0      # Run PRESTO rfifind and generate a mask
 do_prepsub    = 1      # Run PRESTO prepsubband dedispersion
-do_fft        = 0      # FFT *dat files before accelsearch
-do_zap        = 0      # Zap the *fft files
-do_candsearch = 0      # Run PRESTO accelsearch on the data
+do_fft        = 1      # FFT *dat files before accelsearch
+do_zap        = 1      # Zap the *fft files
+do_candsearch = 1      # Run PRESTO accelsearch on the data
 do_presto_sp  = 1      # Run PRESTO singlepulse.py
 do_param_cp   = 0      # copy parameter file to output directory 
 

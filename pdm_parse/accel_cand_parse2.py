@@ -301,7 +301,7 @@ def filename_from_cand(cand, suffix='png'):
 def copy_cand_plots(candlist, topdir, outdir, suffix='png'):
     for ii, cc in enumerate(candlist):
         fname = filename_from_cand(cc, suffix=suffix)
-        out_fname = "cand%04d_%s" %(ii, fname)
+        out_fname = "cand%05d_%s" %(ii, fname)
         infile  = "%s/beam%05d/cands_presto/%s" %(topdir, cc.beam, fname)
         outfile = "%s/%s" %(outdir, out_fname)
         copyfile(infile, outfile)
@@ -385,7 +385,7 @@ def read_top_cands(infile):
     return cand_list
 
 
-def run_prepfold_topcands(clist, bdir, zmax, outfile, errfile, 
+def run_prepfold_topcands_old(clist, bdir, zmax, outfile, errfile, 
                           searchtype='none', extra_args='', 
                           use_mask=False):
     """
@@ -410,7 +410,7 @@ def run_prepfold_topcands(clist, bdir, zmax, outfile, errfile,
         dm    = cc['dm']
         num   = cc['num']
 
-        psname = "cand%04d_%s_DM%.2f_ACCEL_Cand_%d.pfd.ps"\
+        psname = "cand%05d_%s_DM%.2f_ACCEL_Cand_%d.pfd.ps"\
                  %(num, bstr, dm, cnum) 
         if os.path.exists(psname):
             print "File "+psname+" already made, skipping"
@@ -436,7 +436,7 @@ def run_prepfold_topcands(clist, bdir, zmax, outfile, errfile,
         print(orig_candfile)
         print(candfile)
         # Now we can run prepfold command
-        outname = "cand%04d_%s_z%d" %(num, bstr, zval)
+        outname = "cand%05d_%s_z%d" %(num, bstr, zval)
         if ( os.path.exists(candfile) ):
             if use_mask:
                 cmd = "prepfold -noxwin %s -dm %.2f " %(sflag, dm) +\
@@ -463,6 +463,121 @@ def run_prepfold_topcands(clist, bdir, zmax, outfile, errfile,
     return
 
 
+def run_prepfold_topcands(clist, pdir, top_dir, zmax, 
+                          outfile, errfile, searchtype='none', 
+                          extra_args='', use_mask=False):
+    """
+    This function will run prepfold on the candidate files produced
+    by the presto accelsearch.  This essentially replaces the
+    gotocand.py script from the older version of the pipeline
+
+    Work in beam dir  (bdir)
+    Fits files in pdir/part[1-7]/psrfits originally, 
+    link over to bdir
+    """
+    if searchtype == 'fine':
+        sflag = "-fine"
+    elif searchtype =='coarse':
+        sflag = "-coarse"
+    elif searchtype == 'regular':
+        sflag = ""
+    else:
+        sflag = "-nosearch"
+
+    for cc in clist:
+        bstr  = cc['bstr']
+        zval  = cc['zval']
+        cnum  = cc['cnum']
+        cfile = cc['cfile']
+        dm    = cc['dm']
+        num   = cc['num']
+
+        psname = "cand%04d_%s_DM%.2f_ACCEL_Cand_%d.pfd.ps"\
+                 %(num, bstr, dm, cnum) 
+        if os.path.exists(psname):
+            print "File "+psname+" already made, skipping"
+            continue
+        else:
+            pass
+
+        bdir = "%s/%s" %(top_dir, bstr)
+
+        # Symlink FITS files to bdir
+        fitsglob = "%s/part*/psrfits/*%s*fits" %(pdir, bstr)
+        fitslist = glob(fitsglob)
+        fitslist.sort()
+
+        if len(fitslist):
+            fitsnames = [ fits_ii.split('/')[-1] for fits_ii in fitslist ]
+            newpaths = [ "%s/%s" %(bdir, fname) for fname in fitsnames ]
+            for ii in xrange(len(fitsnames)):
+                orig_fits = fitslist[ii]
+                link_fits = newpaths[ii]
+                print("%s ---> %s" %(orig_fits, link_fits))
+                os.symlink(orig_fits, link_fits)
+        else:
+            print("No FITS files found with %s" %fitsglob)
+            continue
+
+        fitsfiles = "%s/*fits" %(bdir)
+        canddir = "%s/cands_presto" %bdir
+        infdir  = "%s/dedisperse" %bdir
+
+        if use_mask:
+            maskfile = "%s/rfi_products/*.mask" %bdir
+        else:
+            maskfile = ''
+        
+        # Need to copy cand file from canddir to bdir
+        orig_candfile = "%s/%s" %(canddir, cfile)
+        candfile = "%s/%s" %(bdir, cfile)
+        copyfile(orig_candfile, candfile)
+        print(orig_candfile)
+        print(candfile)
+
+        # UGH: Need to copy inf file too for some reason
+        inf_name = "%s_DM%.2f.inf" %(bstr, dm)
+        orig_inf_file = "%s/dedisperse/%s" %(bdir, inf_name)
+        inf_file = "%s/%s" %(bdir, inf_name)
+        copyfile(orig_inf_file, inf_file)
+        print(orig_inf_file)
+        print(inf_file)
+
+        # Now we can run prepfold command
+        outname = "cand%04d_%s_z%d" %(num, bstr, zval)
+        if ( os.path.exists(candfile) ):
+            if use_mask:
+                cmd = "prepfold -noxwin %s -dm %.2f " %(sflag, dm) +\
+                      "-accelcand %d -accelfile %s " %(cnum, candfile) +\
+                      "%s " %(extra_args) +\
+                      "-noweights -noscales -nooffsets " +\
+                      "-mask %s -o %s %s" %(maskfile, outname, fitsfiles)
+            else:
+                cmd = "prepfold -noxwin %s -dm %.2f " %(sflag, dm) +\
+                      "-accelcand %d -accelfile %s " %(cnum, candfile) +\
+                      "%s " %(extra_args) +\
+                      "-noweights -noscales -nooffsets " +\
+                      "-o %s %s" %(outname, fitsfiles)
+        
+            try_cmd(cmd, stdout=outfile, stderr=errfile)
+
+        else:
+            print "Could not find %s" %candfile
+            print "and/or         %s" %datfile
+
+        # Now we remove the copied files
+        os.remove(candfile)
+        os.remove(inf_file)
+
+        # Unlink the fits files
+        if len(fitslist):
+            for lfits in newpaths:
+                os.unlink(lfits)
+        else: pass
+
+    return
+
+
 
 ############
 ### MAIN ###
@@ -472,9 +587,9 @@ group = '57519'
 cand_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s/search/cand_files" %(group)
 candfile_template = "beam%05d.ACCEL_300.sifted.cands"
 
-beamlist = np.arange(0, 1000)
+beamlist = np.arange(0, 1261)
 
-#"""
+"""
 candlist = cands_from_many_files(cand_dir, candfile_template, beamlist)
 #out_idx = parse_harmonics(candlist, n=1)
 #out_idx = parse_dupes_r(candlist, r_err=1.5)
@@ -485,16 +600,17 @@ good_cc = [candlist[ii] for ii in out_idx]
 bad_cc  = [candlist[ii] for ii in bad_idx]
 
 print("Good Candidates: %d" %len(good_cc))
-#"""
-
+"""
+part_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s" %(group)
 top_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s/search" %(group)
 out_dir = "/hercules/results/rwharton/fastvis_gc/proc/%s/search/top_plots" %(group)
 
 #copy_cand_plots(good_cc, top_dir, out_dir, suffix='ps')
 
 top_name = "%s/good_cands.txt" %(out_dir)
-write_filtered_cands(good_cc, top_name)
+#write_filtered_cands(good_cc, top_name)
 clist = read_top_cands(top_name)
 
-run_prepfold_topcands(clist, top_dir, 300, None, None, searchtype='nosearch')
+#clist = clist[:1]
+run_prepfold_topcands(clist, part_dir, top_dir, 300, None, None, searchtype='nosearch')
 
